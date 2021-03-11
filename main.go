@@ -2,7 +2,8 @@ package main
 
 import (
 	"log"
-	sw "reposandermets/timetracker/go"
+
+	sw "github.com/reposandermets/timetracker/go"
 )
 
 func main() {
