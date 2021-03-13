@@ -1,15 +1,15 @@
-FROM golang:1.10 AS build
-WORKDIR /go/src
-COPY go ./go
-COPY main.go .
-
-ENV CGO_ENABLED=0
+#build stage
+FROM golang:alpine AS builder
+RUN apk add --no-cache git
+WORKDIR /go/src/app
+COPY . .
 RUN go get -d -v ./...
+RUN go install -v ./...
 
-RUN go build -a -installsuffix cgo -o openapi .
-
-FROM scratch AS runtime
-ENV GIN_MODE=release
-COPY --from=build /go/src/openapi ./
-EXPOSE 8080/tcp
-ENTRYPOINT ["./openapi"]
+#final stage
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
+COPY --from=builder /go/bin/app /app
+ENTRYPOINT ./app
+LABEL Name=veebiprogrammeerimine Version=0.0.1
+EXPOSE 8080

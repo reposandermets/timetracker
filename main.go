@@ -1,15 +1,47 @@
 package main
 
 import (
-	"log"
+	"github.com/gin-gonic/gin"
+	"github.com/reposandermets/timetracker/controller"
+	"github.com/reposandermets/timetracker/repository"
+	"github.com/reposandermets/timetracker/service"
+)
 
-	sw "github.com/reposandermets/timetracker/go"
+var (
+	sessionRepository repository.SessionRepository = repository.NewSessionRepository()
+	sessionService    service.SessionService       = service.New(sessionRepository)
+	sessionController controller.SessionController = controller.New(sessionService)
 )
 
 func main() {
-	log.Printf("Server started")
+	defer sessionRepository.CloseDB()
+	server := gin.New()
+	server.Use(gin.Recovery(), gin.Logger())
 
-	router := sw.NewRouter()
+	apiRoutes := server.Group("/api")
+	{
+		apiRoutes.GET("/session", func(ctx *gin.Context) {
+			ctx.JSON(200, sessionController.FindAll())
+		})
 
-	log.Fatal(router.Run(":8080"))
+		apiRoutes.POST("/session", func(ctx *gin.Context) {
+			session, err := sessionController.Save(ctx)
+			if err != nil {
+				ctx.JSON(400, gin.H{"error": err.Error()})
+			} else {
+				ctx.JSON(400, session)
+			}
+		})
+
+		apiRoutes.PUT("/session/:id", func(ctx *gin.Context) {
+			session, err := sessionController.Update(ctx)
+			if err != nil {
+				ctx.JSON(400, gin.H{"error": err.Error()})
+			} else {
+				ctx.JSON(400, session)
+			}
+		})
+	}
+
+	server.Run(":8080")
 }
