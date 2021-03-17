@@ -1,15 +1,18 @@
 package repository
 
 import (
+	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/reposandermets/timetracker/entity"
 )
 
 type SessionRepository interface {
-	Save(session entity.Session) entity.Session
-	Update(session entity.Session) entity.Session
-	FindAll() []entity.Session
+	FindSessionById(session *entity.Session, SessionID uuid.UUID) *gorm.DB
+	FindUserById(user *entity.User, UserID uuid.UUID) *gorm.DB
+	FindStartedSessionByUserId(session *entity.Session, UserID uuid.UUID) *gorm.DB
+	Save(session *entity.Session) *gorm.DB
+	Update(session *entity.Session) *gorm.DB
 	CloseDB()
 }
 
@@ -40,18 +43,22 @@ func (db *database) CloseDB() {
 	db.connection.Close()
 }
 
-func (db *database) Save(session entity.Session) entity.Session {
-	db.connection.Create(&session)
-	return session
+func (db *database) FindSessionById(session *entity.Session, SessionID uuid.UUID) *gorm.DB {
+	return db.connection.First(session, "id = ?", SessionID.String())
 }
 
-func (db *database) Update(session entity.Session) entity.Session {
-	db.connection.Save(&session)
-	return session
+func (db *database) FindUserById(user *entity.User, UserID uuid.UUID) *gorm.DB {
+	return db.connection.First(user, "id = ?", UserID.String())
 }
 
-func (db *database) FindAll() []entity.Session {
-	var sessions []entity.Session
-	db.connection.Find(&sessions)
-	return sessions
+func (db *database) Save(session *entity.Session) *gorm.DB {
+	return db.connection.Create(session)
+}
+
+func (db *database) Update(session *entity.Session) *gorm.DB {
+	return db.connection.Save(session)
+}
+
+func (db *database) FindStartedSessionByUserId(session *entity.Session, UserID uuid.UUID) *gorm.DB {
+	return db.connection.Where("user_id = ? AND status = ?", UserID.String(), "started").First(session)
 }

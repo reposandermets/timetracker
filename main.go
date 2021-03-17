@@ -1,47 +1,27 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/reposandermets/timetracker/controller"
-	"github.com/reposandermets/timetracker/repository"
-	"github.com/reposandermets/timetracker/service"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/reposandermets/timetracker/entity"
+	"github.com/reposandermets/timetracker/server"
 )
 
-var (
-	sessionRepository repository.SessionRepository = repository.NewSessionRepository()
-	sessionService    service.SessionService       = service.New(sessionRepository)
-	sessionController controller.SessionController = controller.New(sessionService)
-)
+// import "github.com/reposandermets/timetracker/server"
 
-func main() {
-	defer sessionRepository.CloseDB()
-	server := gin.New()
-	server.Use(gin.Recovery(), gin.Logger())
-
-	apiRoutes := server.Group("/api")
-	{
-		apiRoutes.GET("/session", func(ctx *gin.Context) {
-			ctx.JSON(200, sessionController.FindAll())
-		})
-
-		apiRoutes.POST("/session", func(ctx *gin.Context) {
-			session, err := sessionController.Save(ctx)
-			if err != nil {
-				ctx.JSON(400, gin.H{"error": err.Error()})
-			} else {
-				ctx.JSON(400, session)
-			}
-		})
-
-		apiRoutes.PUT("/session/:id", func(ctx *gin.Context) {
-			session, err := sessionController.Update(ctx)
-			if err != nil {
-				ctx.JSON(400, gin.H{"error": err.Error()})
-			} else {
-				ctx.JSON(400, session)
-			}
-		})
+func dbTest() {
+	db, err := gorm.Open("sqlite3", "test.db")
+	if err != nil {
+		panic("Failed to connect database")
 	}
 
-	server.Run(":8080")
+	existingSession := entity.Session{}
+	result := db.First(&existingSession, "id = ?", "8b8911f9-e09e-4c0e-bce0-b8b72f511053")
+	println(result)
+}
+
+func main() {
+	println("Hello world")
+	dbTest()
+	server.Run()
 }
