@@ -13,6 +13,7 @@ type SessionRepository interface {
 	FindStartedSessionByUserId(session *entity.Session, UserID uuid.UUID) *gorm.DB
 	Save(session *entity.Session) *gorm.DB
 	Update(session *entity.Session) *gorm.DB
+	FindSessionsByUserId(sessions *[]entity.Session, UserID uuid.UUID) *gorm.DB
 	CloseDB()
 }
 
@@ -37,6 +38,10 @@ func NewSessionRepository() SessionRepository {
 	return &database{
 		connection: db,
 	}
+}
+
+func (db *database) FindSessionsByUserId(sessions *[]entity.Session, UserID uuid.UUID) *gorm.DB {
+	return db.connection.Where("user_id = ?", UserID.String()).Order("started_at desc").Find(sessions)
 }
 
 func (db *database) CloseDB() {

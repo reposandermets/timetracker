@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/google/uuid"
 	"github.com/reposandermets/timetracker/entity"
 	"github.com/reposandermets/timetracker/service"
@@ -12,6 +13,7 @@ import (
 type SessionController interface {
 	Save(ctx *gin.Context) (entity.Session, error)
 	Update(ctx *gin.Context) (entity.Session, error)
+	Find(ctx *gin.Context) ([]entity.Session, error)
 }
 
 type controller struct {
@@ -24,6 +26,26 @@ func New(service service.SessionService) SessionController {
 	}
 }
 
+type UserT struct {
+	UserID string `form:"user_id" binding:"required"`
+}
+
+func (c *controller) Find(ctx *gin.Context) ([]entity.Session, error) {
+	sessions := []entity.Session{}
+	user := UserT{}
+	if err := ctx.ShouldBindWith(&user, binding.Query); err != nil {
+		return sessions, err
+	}
+
+	uuid, err := uuid.Parse(user.UserID)
+
+	if err != nil {
+		return sessions, err
+	}
+
+	return c.service.FindSessionsByUserId(uuid)
+}
+
 func (c *controller) Save(ctx *gin.Context) (entity.Session, error) {
 	var session entity.Session
 	err := ctx.ShouldBindJSON(&session)
@@ -31,10 +53,9 @@ func (c *controller) Save(ctx *gin.Context) (entity.Session, error) {
 		return session, err
 	}
 	if session.Status != "started" {
-		return session, errors.New("status has to be 'started'")
+		return session, errors.New("status has to be started'")
 	}
-	s, err := c.service.Save(session)
-	return s, err
+	return c.service.Save(session)
 }
 
 func (c *controller) Update(ctx *gin.Context) (entity.Session, error) {
@@ -55,6 +76,5 @@ func (c *controller) Update(ctx *gin.Context) (entity.Session, error) {
 	}
 
 	session.ID = uuid
-	s, err := c.service.Update(session)
-	return s, err
+	return c.service.Update(session)
 }

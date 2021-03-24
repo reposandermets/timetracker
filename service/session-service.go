@@ -13,6 +13,7 @@ import (
 type SessionService interface {
 	Save(entity.Session) (entity.Session, error)
 	Update(session entity.Session) (entity.Session, error)
+	FindSessionsByUserId(UserID uuid.UUID) ([]entity.Session, error)
 }
 
 type sessionService struct {
@@ -23,6 +24,12 @@ func New(repo repository.SessionRepository) SessionService {
 	return &sessionService{
 		sessionRepository: repo,
 	}
+}
+
+func (service *sessionService) FindSessionsByUserId(UserID uuid.UUID) ([]entity.Session, error) {
+	sessions := []entity.Session{}
+	result := service.sessionRepository.FindSessionsByUserId(&sessions, UserID)
+	return sessions, result.Error
 }
 
 func (service *sessionService) Save(session entity.Session) (entity.Session, error) {
