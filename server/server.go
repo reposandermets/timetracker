@@ -20,6 +20,15 @@ func Run() {
 
 	apiRoutes := server.Group("/api")
 	{
+		apiRoutes.GET("/user", func(ctx *gin.Context) {
+			users, err := sessionController.FindUsers()
+			if err != nil {
+				ctx.JSON(400, gin.H{"error": err.Error()})
+				return
+			}
+			ctx.JSON(200, users)
+		})
+
 		apiRoutes.GET("/session", func(ctx *gin.Context) {
 			sessions, err := sessionController.Find(ctx)
 			if err != nil {
@@ -35,7 +44,7 @@ func Run() {
 				ctx.JSON(400, gin.H{"error": err.Error()})
 				return
 			}
-			ctx.JSON(200, session)
+			ctx.JSON(201, session)
 		})
 
 		apiRoutes.PUT("/session/:id", func(ctx *gin.Context) {

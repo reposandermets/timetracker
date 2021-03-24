@@ -14,6 +14,7 @@ type SessionRepository interface {
 	Save(session *entity.Session) *gorm.DB
 	Update(session *entity.Session) *gorm.DB
 	FindSessionsByUserId(sessions *[]entity.Session, UserID uuid.UUID) *gorm.DB
+	FindUsers(users *[]entity.User) *gorm.DB
 	CloseDB()
 }
 
@@ -38,6 +39,10 @@ func NewSessionRepository() SessionRepository {
 	return &database{
 		connection: db,
 	}
+}
+
+func (db *database) FindUsers(users *[]entity.User) *gorm.DB {
+	return db.connection.Find(users)
 }
 
 func (db *database) FindSessionsByUserId(sessions *[]entity.Session, UserID uuid.UUID) *gorm.DB {

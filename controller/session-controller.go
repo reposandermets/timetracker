@@ -14,6 +14,7 @@ type SessionController interface {
 	Save(ctx *gin.Context) (entity.Session, error)
 	Update(ctx *gin.Context) (entity.Session, error)
 	Find(ctx *gin.Context) ([]entity.Session, error)
+	FindUsers() ([]entity.User, error)
 }
 
 type controller struct {
@@ -28,6 +29,10 @@ func New(service service.SessionService) SessionController {
 
 type UserT struct {
 	UserID string `form:"user_id" binding:"required"`
+}
+
+func (c *controller) FindUsers() ([]entity.User, error) {
+	return c.service.FindUsers()
 }
 
 func (c *controller) Find(ctx *gin.Context) ([]entity.Session, error) {
