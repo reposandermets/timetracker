@@ -2,43 +2,74 @@
 
 ## Requirements
 
+### Fetch users - GET /api/user
 
-POST /session Payload optional name
-As a user, I want to be able to start a time tracking session
+Returns list of users, currently only 1 user created
 
-PUT /session?session_group_id=1
+```json
+[
+    {
+        "id": "88895109-78cf-45bf-a2ba-2af17881e72e",
+        "name": "Admin",
+        "Sessions": null
+    }
+]
+```
+
+
+### Start session - POST /session
+
+As a user, I want to be able to create a session
+
+Payload:
+```json
+{
+    "status": "started",
+    "user_id": "<used id>"
+}
+```
+
+### Pause/Stop session - PATCH /session/:id
+
 As a user, I want to be able to save my time tracking session when I am done with it
 
-GET /session?timeframe=day
-As a user, I want an overview of my sessions for the day, week and month
+Payload:
 
-PUT /session/{id}?stop=true
-As a user, I want to be able to stop a time tracking session
+```json
+{
+    "status": "<ended | paused>",
+    "user_id": "<used id>"
+}
+```
 
-PUT /session/{id} Payload name
-As a user, I want to be able to name my time tracking session
+### See sessions - Get /session
+
+As a user, I want to see my latest sessions
 
 ## DB
 
-### Table User
-
-| Name    | Type   |
-| ------- | ------ |
-| user_id | string |
-
-### Table Session
+### Table `users`
 
 | Name             | Type   |
-| ----------       | ------ |
-| session_id       | string |
-| session_group_id | string |
-| status           | string |
-| start            | int    |
-| end              | int    |
-| user_id          | string |
+| -------          | ------ |
+| id               | string |
+| name             | string |
 
-## REST paths needed
+### Table `sessions`
 
-## OPEN API specs
+| Name             | Type      |
+| ----------       | ------    |
+| id               | string    |
+| user_id          | string    |
+| status           | string    |
+| started_at       | Timestamp |
+| stopper_at       | Timestamp |
+| ended_at         | Timestamp |
+| seconds          | float     |
 
-https://mermade.github.io/openapi-gui/
+## Run with docker
+
+
+```sh
+docker-compose up --build -d
+```
