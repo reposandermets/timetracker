@@ -46,7 +46,7 @@ Payload:
 
 As a user, I want to see my latest sessions
 
-## DB
+## DB SQlite
 
 ### Table `users`
 
@@ -67,8 +67,7 @@ As a user, I want to see my latest sessions
 | ended_at         | Timestamp |
 | seconds          | float     |
 
-## Run with docker
-
+## Run with docker 
 
 ```sh
 docker-compose up --build -d
