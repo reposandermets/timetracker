@@ -1,21 +1,10 @@
 # veebiprogrammeerine
 
-## Requirements
+## Requirements & ROUTES
 
 ### Fetch users - GET /api/user
 
 Returns list of users, currently only 1 user created
-
-```json
-[
-    {
-        "id": "88895109-78cf-45bf-a2ba-2af17881e72e",
-        "name": "Admin",
-        "Sessions": null
-    }
-]
-```
-
 
 ### Start session - POST /session
 
@@ -42,11 +31,11 @@ Payload:
 }
 ```
 
-### See sessions - Get /session
+### See sessions - GET /session
 
 As a user, I want to see my latest sessions
 
-## DB SQlite
+## DB SQLite
 
 ### Table `users`
 
